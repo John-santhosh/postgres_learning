@@ -1,4 +1,4 @@
-
+-- LOOP STATEMENT
 -- syntax
 /*
 LOOP
@@ -6,3 +6,152 @@ LOOP
 	EXIT WHEN condition is true;
 END LOOP;
 */
+--You can also exit with EXIT; with no condition
+CREATE OR REPLACE FUNCTION fn_llop_test(max_num int)
+RETURNS int AS
+$body$
+DECLARE
+	j int DEFAULT 1;
+	total_sum int DEFAULT 0;
+BEGIN
+	LOOP
+		total_sum := total_sum + j;
+		j := j+ 1;
+		EXIT WHEN j > max_num;
+	END LOOP;
+	RETURN total_sum;
+END;
+$body$
+LANGUAGE plpgsql
+
+select fn_llop_test(5)
+
+-- FOR LOOP
+
+/*
+Iterates over range of values or data coming from a table. 
+
+FOR counter_name IN start_value .. end_value BY stepping
+LOOP
+	Statements
+END LOOP;
+*/
+
+CREATE OR REPLACE FUNCTION fn_fotLoop_test(max_num int)
+RETURNS int AS
+$body$
+DECLARE
+	total_sum int DEFAULT 0;
+BEGIN
+  --FOR counter_name IN start_value .. end_value BY stepping
+	-- ADDING ALL ODD VALUES
+	FOR i IN 1 .. max_num BY 2
+-- also able to count in reverse
+-- 	FOR i IN REVERSE max_num .. 1 BY 2
+	
+	LOOP
+		total_sum := total_sum + i;
+	END LOOP;
+	RETURN total_sum;
+END;
+$body$
+LANGUAGE plpgsql
+
+select fn_fotLoop_test(5)
+
+--
+-- Full explanation in chatgpt
+DO
+$body$
+DECLARE
+	rec record;
+BEGIN
+	FOR rec IN 
+	SELECT first_name, last_name
+	FROM sales_person
+	LIMIT 5
+	Loop
+	RAISE NOTICE 'first name is : %, last name is: %', rec.first_name, rec.last_name;
+	END LOOP;
+END
+$body$
+LANGUAGE plpgsql
+
+/*
+-- DO: The DO statement is used to execute an anonymous code block in PostgreSQL.It allows you to write and execute a block of procedural code without the need to create a stored function or procedure.
+
+-- result sets: In PostgreSQL, as well as in many other relational database systems, a result set is the set of rows returned by a SELECT query or the output of a stored procedure or function. It is essentially the outcome of a query or a computation that produces tabular data.
+
+-- RAISE NOTICE
+In PostgreSQL, the RAISE NOTICE statement is used for generating a message at a certain log level. It is primarily used for debugging and informational purposes during the development and testing of SQL functions, stored procedures, or anonymous code blocks.
+ 'message': This is the message string that you want to log. It can be a simple string or a string with placeholders for expressions.
+
+expression: These are optional values that can be included in the message using placeholders. The values of these expressions will be inserted into the message where the placeholders are.
+
+*/
+
+/* small break down of the above code
+	FOR ( rec IN 
+	SELECT first_name, last_name
+	FROM sales_person
+	LIMIT 5 )
+	{ 
+	Loop
+	RAISE NOTICE '% %', rec.first_name, rec.last_name;
+	END LOOP 
+	};
+*/
+
+	
+-----------------------
+
+-- forEach
+
+DO
+$body$
+DECLARE
+	arr1 int[] := array[1,2,3];
+	i int;
+BEGIN
+	FOREACH i IN ARRAY arr1
+	Loop
+	RAISE NOTICE '%',i;
+	END LOOP;
+END
+$body$
+LANGUAGE plpgsql
+
+-- while
+
+DO
+$body$
+DECLARE
+	j int DEFAULT 1;
+	total_sum int DEFAULT 0;
+BEGIN
+	while j <= 10
+	Loop
+	total_sum := total_sum + j;
+	j := j +1;
+	END LOOP;
+	RAISE NOTICE '%', total_sum;
+END
+$body$
+LANGUAGE plpgsql
+
+-- 
+--print odd numbers
+DO
+$body$
+DECLARE
+	i int DEFAULT 1;
+BEGIN
+	Loop
+		i := i +1;
+		EXIT WHEN i > 10;
+		CONTINUE WHEN MOD(i,2) = 0;
+		RAISE NOTICE 'Num: %', I;
+	END LOOP;
+END;
+$body$
+LANGUAGE plpgsql
