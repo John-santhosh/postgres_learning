@@ -1,0 +1,8 @@
+
+-- syntax
+/*
+LOOP
+	Statements
+	EXIT WHEN condition is true;
+END LOOP;
+*/

@@ -1,0 +1,221 @@
+
+-- 
+CREATE OR REPLACE FUNCTION fn_get_price_prod_name(prod_name varchar)
+RETURNS numeric AS
+$body$
+BEGIN
+	RETURN item.price 
+	FROM item
+	NATURAL JOIN product
+	WHERE product.name = prod_name;
+END
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_price_prod_name('Grandview')
+
+--
+-- using VARIABLES in a function
+
+CREATE OR REPLACE FUNCTION fn_get_sum(val1 int, val2 int)
+RETURNS int AS 
+$body$
+DECLARE
+	ans int;
+BEGIN
+	ans := val1 + val2;
+	RETURN ans;
+END
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_sum(5,3)
+
+--
+-- generate a random  number
+CREATE OR REPLACE FUNCTION fn_get_random_num(min_val int, max_val int)
+RETURNS int AS 
+$body$
+DECLARE
+	rand int;
+BEGIN
+-- 	ans := val1 + val2;
+	SELECT random()*()(max_val - min_val) + min_val INTO rand; -- putting the valu INTO rand
+	RETURN rand;
+END
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_random_num(1, 50)
+
+-- getting a random record
+
+CREATE OR REPLACE FUNCTION fn_get_rand_sales_person()
+RETURNS varchar AS 
+$body$
+DECLARE
+	rand int;
+	emp record;
+BEGIN
+	SELECT random()*(5 - 1) + 1 INTO rand; -- putting the valu INTO rand
+	SELECT * 
+	FROM sales_person 
+	INTO emp
+	WHERE rand = id;
+	--  WHERE rand = sales_person.id;
+	RETURN CONCAT(emp.first_name, ' ', emp.last_name);
+
+END
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_rand_sales_person()
+SELECT random()*(5 - 1)+1
+SELECT random()*5
+
+-- 
+-- IN, INOUT, OUT
+-- These can be used to except and return multiple values without return
+CREATE OR REPLACE FUNCTION fn_get_sum_2(IN val1 int, IN val2 int, OUT ans int) AS 
+$body$
+-- DECLARE
+-- 	rand int;
+-- 	emp record;
+BEGIN
+	
+	ans:= val1 + val2;
+
+END;
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_sum_2(4,5)
+
+-- USING MULTIPLE OUT
+
+CREATE OR REPLACE FUNCTION fn_get_cust_bday(IN the_month int,
+										OUT bd_month int,
+										OUT bd_day int,
+										OUT f_name varchar,
+										OUT l_name varchar) 
+AS 
+$body$
+BEGIN
+	
+	SELECT EXTRACT(MONTH FROM birth_date), EXTRACT(DAY FROM birth_date),
+	first_name, last_name 
+	INTO bd_month, bd_day, f_name, l_name
+	FROM customer
+	WHERE  EXTRACT(MONTH FROM birth_date) = the_month
+	LIMIT 1;
+
+END;
+$body$
+LANGUAGE plpgsql
+
+SELECT (fn_get_cust_bday(12)).*
+
+--
+-- Returning query results
+CREATE OR REPLACE FUNCTION fn_get_sales_person()
+RETURNS SETOF sales_person AS 
+$body$
+
+BEGIN
+	RETURN QUERY -- will return the result of the query below
+	SELECT * 
+	FROM sales_person;
+END
+$body$
+LANGUAGE plpgsql
+
+select (fn_get_sales_person()).*
+
+--
+
+SELECT name, supplier, price 
+FROM item 
+JOIN product 
+ON product.id = item.product_id
+ORDER BY price DESC
+LIMIT 10
+
+CREATE OR REPLACE FUNCTION fn_get_t10_expensive_prods()
+-- to return values of multiple tables
+RETURNS TABLE (
+	name varchar,
+	supplier varchar,
+	price numeric
+) AS 
+$body$
+
+BEGIN
+	RETURN QUERY -- will return the result of the query below
+	SELECT product.name, product.supplier, item.price 
+	FROM item 
+	NATURAL JOIN product 
+	ORDER BY item.price DESC
+	LIMIT 10;
+END
+$body$
+LANGUAGE plpgsql
+
+select (fn_get_t10_expensive_prods()).*
+
+--
+-- IF, IFELSE, ELSE
+CREATE OR REPLACE FUNCTION fn_check_month_orders(the_month int)
+RETURNS	varchar AS
+$body$
+DECLARE
+	total_orders int;
+BEGIN	
+
+	SELECT COUNT(purchase_order_number)
+	INTO total_orders
+	FROM sales_order
+	WHERE EXTRACT(MONTH FROM time_order_taken) = the_month;
+	IF total_orders > 5 THEN
+		RETURN CONCAT(total_orders, ' Orders : Doing Good');
+	ELSEIF total_orders < 5 THEN
+		RETURN CONCAT(total_orders, ' Orders : Doing Bad');
+	ELSE
+		RETURN CONCAT(total_orders, ' Orders : On Target');
+	END IF;
+END
+$body$
+LANGUAGE plpgsql
+
+select fn_check_month_orders(9)
+
+
+--
+-- CASE STATEMENT
+CREATE OR REPLACE FUNCTION fn_check_month_orders_usingCaseStatement(the_month int)
+RETURNS	varchar AS
+$body$
+DECLARE
+	total_orders int;
+BEGIN	
+
+	SELECT COUNT(purchase_order_number)
+	INTO total_orders
+	FROM sales_order
+	WHERE EXTRACT(MONTH FROM time_order_taken) = the_month;
+	CASE	
+		WHEN total_orders > 5 THEN
+			RETURN CONCAT(total_orders, ' Orders : Doing Good');
+		WHEN total_orders < 5 THEN
+			RETURN CONCAT(total_orders, ' Orders : Doing Bad');
+		ELSE
+			RETURN CONCAT(total_orders, ' Orders : On Target');
+		END CASE;
+END
+$body$
+LANGUAGE plpgsql
+
+select fn_check_month_orders_usingCaseStatement(9)
+
+
+
+

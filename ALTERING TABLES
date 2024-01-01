@@ -1,0 +1,27 @@
+-- ADD NEW COLUMN TO A TABLE
+-- ALTER TABLE sales_item ADD day_of_week VARCHAR(8);
+
+-- MODIFY ARE CHANGE A COLUMN.
+--  ALTER TABLE sales_item ALTER COLUMN day_of_week SET NOT NULL;
+
+-- CHANGE NAME OF A COLUMN
+-- ALTER TABLE sales_item RENAME COLUMN day_of_week TO weekday
+
+-- CREATE TABLE transaction_type(
+-- 	name VARCHAR(30) NOT NULL,
+-- 	payment_type VARCHAR(30) NOT NULL,
+-- 	id SERIAL PRIMARY KEY
+-- )
+-- ALTER TABLE transaction_type RENAME TO transaction;
+
+-- CREATE INDEX transaction_id ON transaction(name)
+-- CREATE INDEX transaction_id_2 ON transaction(name,payment_type)
+
+-- DELETE ALL THE DATA INSIDE A TABLE
+-- TRUNCATE TABLE transaction;
+
+-- INSERT INTO transaction(name, payment_type) VALUES('santhosh', 'CREDIT_CARD')
+-- SELECT * FROM transaction ORDER BY id 
+
+-- DELTE A TABLE ALL TOGETHTER WIT DATA
+DROP TABLE transaction

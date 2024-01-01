@@ -1,0 +1,101 @@
+-- join 2 TABLES
+SELECT item_id, price , item.id AS item_id_1, sales_item.id AS sales_idtem_id
+FROM item INNER JOIN sales_item
+ON item.id = sales_item.id
+ORDER BY item_id;
+
+-- JOIN 3 TABELS
+SELECT sales_order.id, sales_item.quantity, item.price, (sales_item.quantity * item.price) AS total
+FROM sales_order
+JOIN sales_item 
+ON sales_order.id = sales_item.sales_order_id
+JOIN item
+ON item.id = sales_item.item_id
+ORDER BY sales_order.id
+
+
+--- outer join
+SELECT name, supplier, price
+FROM product LEFT JOIN item
+ON item.product_id = product.id
+ORDER BY name
+
+-- cross join 
+SELECT name, supplier, price
+FROM product cross JOIN item
+-- ON item.id = product.id
+ORDER BY name;
+
+-- union join 
+SELECT first_name, last_name, zip, birth_date
+FROM customer
+WHERE EXTRACT(MONTH FROM birth_date)= 12
+UNION
+SELECT first_name, last_name, zip, birth_date
+FROM sales_person
+WHERE EXTRACT(MONTH FROM birth_date)= 12
+ORDER BY birth_date
+
+-- is null
+
+SELECT price, product_id
+FROM item
+WHERE price IS NOT NULL
+
+-- RegEx
+SELECT first_name, last_name 
+FROM customer
+WHERE first_name SIMILAR TO 'M%' OR last_name LIKE 'M______'
+
+SELECT first_name, last_name 
+FROM customer
+WHERE last_name ~ 'ez|son' -- end with ez | son
+
+
+-- GROUP_BY examples
+
+SELECT EXTRACT(MONTH FROM birth_date) AS Month, COUNT(*) AS Amount
+FROM customer
+GROUP BY Month
+ORDER BY Month
+
+-- aggregate functions
+
+SELECT COUNT(*) AS items, SUM(price) AS Value, ROUND(AVG(price),2) AS AVG,
+MIN(price) AS MIN, MAX(price) AS MAX
+FROM item
+
+
+-- working with VIEWS
+
+CREATE VIEW purchase_order_overview AS 
+SELECT sales_order.purchase_order_number, customer.company, 
+sales_item.quantity, product.supplier, product.name, item.price, 
+(sales_item.quantity * item.price) AS Total,
+--Remove concat if you want this to be updatable owhen changes happens
+CONCAT(sales_person.first_name, ' ', sales_person.last_name) AS Salesperson
+FROM sales_order 
+JOIN sales_item 
+ON sales_item.sales_order_id = sales_order.id  -- Tables go together by joining on sales order id
+-- Any time you join tables you need to find foreign and primary keys that match up
+JOIN item 
+ON item.id = sales_item.item_id
+JOIN customer
+ON sales_order.cust_id = customer.id  -- join customer using customer ids
+JOIN product
+ON product.id = item.product_id
+JOIN sales_person
+ON sales_person.id = sales_order.sales_person_id
+ORDER BY purchase_order_number;
+-- When data in the database is updated so is the view. You can use the view in all the same ways you can a regular table. If you want it to be updatable though it can’t include DISTINCT, UNION, Aggregate Functions, GROUP BY or HAVING.
+
+SELECT * FROM purchase_order_overview
+
+
+select * from product_type
+select * from product
+SElect * FROM item
+SELECT * FROM customer
+SELECT * FROM sales_person
+SELECT * FROM sales_order
+SELECT * FROM sales_item     

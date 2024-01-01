@@ -1,0 +1,47 @@
+-- SELECT * FROM product
+
+-- ALTER TABLE sales_order ALTER COLUMN purchase_order_number TYPE BIGINT
+
+-- INSERT INTO sales_order
+-- VALUES 
+-- (1, 2, '2018-03-23 10:26:23', 20183231026, 5440314057399014, 3, 5, 415, 'Ashley Martin'), ...
+
+-- INSERT INTO sales_item VALUES 
+-- (24, 70, 2, 0.11, false, 0.0), ...
+
+-- SELECT * FROM sales_item
+-- WHERE quantity >= 2
+
+-- SELECT time_order_taken, cust_id
+-- FROM sales_order
+-- where time_order_taken > '2018-12-01' AND time_order_taken < '2018-12-31'
+
+-- SELECT * FROM sales_order
+
+-- SELECT * FROM sales_item 
+-- WHERE discount > .15
+-- ORDER BY discount DESC;
+
+-- SELECT CONCAT(first_name, ' ' , last_name) AS name, phone, state
+-- FROM customer
+-- WHERE state = 'TX'
+
+-- SELECT * FROM item
+
+-- ***** GROUP BY
+-- SELECT product_id, SUM(price) AS Total
+-- FROM item 
+-- where product_id = 1
+-- GROUP BY id;
+
+SELECT DISTINCT state
+FROM customer
+where state <> 'CA'
+ORDER BY state
+
+select state from customer
+where state in ('CA', 'TX')
+
+SELECT * FROM item
+
+ 

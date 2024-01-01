@@ -1,0 +1,162 @@
+--After creating the function they appear in the functions folder. You can see info on the function by using properties on the function.
+
+
+--You are going to want to escape the quotes that surround your SQL so you can use quotes in your queries. $$ allows you to do this.
+
+CREATE OR REPLACE FUNCTION fn_add_ints(int, int)
+RETURNS int as 
+$body$
+-- $1 and $2 represent the parameters
+SELECT $1 + $2
+$body$
+LANGUAGE SQL
+
+SELECT  fn_add_ints(5,3);
+
+
+-- function with void type
+
+CREATE OR REPLACE FUNCTION fn_update_employee_status_2()
+RETURNS void as 
+$body$
+	UPDATE sales_person
+	SET state = 'PA'
+	WHERE state is null
+$body$
+LANGUAGE SQL
+
+SELECT fn_update_employee_status_2()
+
+--
+
+CREATE OR REPLACE FUNCTION fn_max_product_price()
+RETURNS numeric as 
+$body$
+	SELECT MAX(price) 
+	FROM item
+$body$
+LANGUAGE SQL
+
+SELECT fn_max_product_price();
+
+--
+
+
+CREATE OR REPLACE FUNCTION fn_get_value_inventory()
+RETURNS numeric as 
+$body$
+	SELECT sum(price) 
+	FROM item;
+$body$
+LANGUAGE SQL
+
+SELECT fn_get_value_inventory();
+
+-- 
+
+CREATE OR REPLACE FUNCTION fn_get_customer()
+RETURNS numeric as 
+$body$
+	SELECT COUNT(*) FROM customer
+$body$
+LANGUAGE SQL
+
+SELECT fn_get_customer()
+
+--
+
+CREATE OR REPLACE FUNCTION fn_number_customer_no_phone()
+RETURNS numeric as 
+$body$
+-- 	SELECT CONCAT(first_name, ' ', last_name)
+	SELECT COUNT(*)
+	FROM customer
+	WHERE phone is null
+$body$
+LANGUAGE SQL
+
+SELECT fn_number_customer_no_phone()
+
+--
+--named parameters
+CREATE OR REPLACE FUNCTION fn_get_number_customers_from_state(state_name char(3))
+RETURNS numeric as 
+$body$
+	SELECT COUNT(*)
+	FROM customer
+	WHERE state = state_name
+$body$
+LANGUAGE SQL
+
+select fn_get_number_customers_from_state('TX')
+
+
+--
+
+CREATE OR REPLACE FUNCTION fn_get_num_order_from_customer(cus_fname varchar, cus_lname varchar)
+
+RETURNS numeric as 
+$body$
+	SELECT COUNT(*)
+	FROM sales_order
+	NATURAL JOIN customer
+	WHERE customer.first_name = cus_fname AND customer.last_name = cus_lname;
+$body$
+
+LANGUAGE SQL
+
+SELECT fn_get_num_order_from_customer('John', 'Santhosh')
+
+-- retrun a Row/composite
+
+CREATE OR REPLACE FUNCTION fn_get_last_order()
+
+RETURNS sales_order as 
+$body$
+	SELECT *
+	FROM sales_order
+	ORDER BY time_order_taken DESC
+	LIMIT 1
+$body$
+
+LANGUAGE SQL
+
+SELECT (fn_get_last_order()).* -- ()* used to get all cloumn from the table
+SELECT (fn_get_last_order()).credit_card_number -- to get a spicifuc column
+
+-- Get Multiple rows
+
+
+
+CREATE OR REPLACE FUNCTION fn_get_emp_locaiton(loc varchar)
+-- use SETOF to return multiple rows.
+RETURNS SETOF sales_person as 
+$body$
+	SELECT * FROM sales_person
+	WHERE state = loc
+$body$
+
+LANGUAGE SQL
+
+SELECT (fn_get_emp_locaiton('CA')).*
+
+
+-- 
+CREATE OR REPLACE FUNCTION fn_get_name_phone_from_emp(loc varchar)
+-- use SETOF to return multiple rows.
+RETURNS SETOF sales_person as 
+$body$
+	SELECT CONCAT(first_name, ' ', last_name) AS full_name, phone FROM sales_person
+	WHERE state = loc
+$body$
+
+LANGUAGE SQL
+
+
+
+
+
+
+
+
+
