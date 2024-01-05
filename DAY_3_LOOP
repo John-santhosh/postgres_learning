@@ -155,3 +155,24 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql
+
+--
+CREATE OR REPLACE FUNCTION fn_get_suppier_value(the_supplier varchar)
+RETURNS varchar as
+$body$
+DECLARE
+	supplier_name varchar;
+	price_sum int;
+BEGIN
+	SELECT product.supplier, SUM(item.price)
+	INTO supplier_name, price_sum
+	FROM product, item
+	WHERE product.supplier = the_supplier
+	GROUP BY (product.supplier);
+	RETURN CONCAT(supplier_name, ' Inventory value ', price_sum);
+END
+$body$
+LANGUAGE plpgsql
+
+SELECT fn_get_suppier_value('Nike')
+select * from product
